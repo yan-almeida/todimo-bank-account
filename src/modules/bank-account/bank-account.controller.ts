@@ -9,6 +9,7 @@ import {
   ParseUUIDPipe,
   Patch,
   Post,
+  UseGuards,
 } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
@@ -17,6 +18,7 @@ import {
   ApiOkResponse,
   ApiTags,
 } from '@nestjs/swagger';
+import { ActiveGuard } from 'src/common/guards/active.guard';
 import { BankAccountService } from './bank-account.service';
 import { BankAccountDto } from './dto/bank-account.dto';
 import { CreateBankAccountDto } from './dto/create-bank-account.dto';
@@ -24,6 +26,7 @@ import { UpdateBankAccountDto } from './dto/update-bank-account.dto';
 
 @ApiTags('Bank Account')
 @Controller('bank-account')
+@UseGuards(ActiveGuard)
 export class BankAccountController {
   constructor(private readonly bankAccountService: BankAccountService) {}
 
@@ -79,7 +82,8 @@ export class BankAccountController {
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.bankAccountService.remove(id);
+  remove(@Param('id') id: number) {
+    return id;
+    // return this.bankAccountService.remove(id);
   }
 }

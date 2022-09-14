@@ -9,5 +9,5 @@ export declare class BankAccountController {
     findAll(): Promise<BankAccountDto[]>;
     findOne(id: string): Promise<BankAccountDto>;
     update(id: string, updateBankAccountDto: UpdateBankAccountDto): string;
-    remove(id: string): string;
+    remove(id: number): number;
 }

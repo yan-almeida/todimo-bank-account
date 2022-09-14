@@ -6,7 +6,9 @@ import {
 import { NestFactory, Reflector } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
-import { TimeoutInterceptor } from './interceptors/timeout.interceptor';
+import { HttpExceptionFilter } from './common/exception-filters/http.exception-filter';
+import { TimeoutInterceptor } from './common/interceptors/timeout.interceptor';
+import { IntPipe } from './common/pipes/int.pipe';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -24,11 +26,13 @@ async function bootstrap() {
     new ValidationPipe({
       transform: true,
     }),
+    new IntPipe(),
   );
   app.useGlobalInterceptors(
     new ClassSerializerInterceptor(app.get(Reflector)),
     new TimeoutInterceptor(),
   );
+  app.useGlobalFilters(new HttpExceptionFilter());
 
   await app.listen(3000);
   const url = await app.getUrl();

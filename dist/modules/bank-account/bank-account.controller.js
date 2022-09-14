@@ -15,6 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.BankAccountController = void 0;
 const common_1 = require("@nestjs/common");
 const swagger_1 = require("@nestjs/swagger");
+const active_guard_1 = require("../../common/guards/active.guard");
 const bank_account_service_1 = require("./bank-account.service");
 const bank_account_dto_1 = require("./dto/bank-account.dto");
 const create_bank_account_dto_1 = require("./dto/create-bank-account.dto");
@@ -39,7 +40,7 @@ let BankAccountController = class BankAccountController {
         return this.bankAccountService.update(id, updateBankAccountDto);
     }
     remove(id) {
-        return this.bankAccountService.remove(id);
+        return id;
     }
 };
 __decorate([
@@ -90,12 +91,13 @@ __decorate([
     (0, common_1.Delete)(':id'),
     __param(0, (0, common_1.Param)('id')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
+    __metadata("design:paramtypes", [Number]),
     __metadata("design:returntype", void 0)
 ], BankAccountController.prototype, "remove", null);
 BankAccountController = __decorate([
     (0, swagger_1.ApiTags)('Bank Account'),
     (0, common_1.Controller)('bank-account'),
+    (0, common_1.UseGuards)(active_guard_1.ActiveGuard),
     __metadata("design:paramtypes", [bank_account_service_1.BankAccountService])
 ], BankAccountController);
 exports.BankAccountController = BankAccountController;
