@@ -16,17 +16,26 @@ exports.BankAccountService = void 0;
 const common_1 = require("@nestjs/common");
 const typeorm_1 = require("@nestjs/typeorm");
 const typeorm_2 = require("typeorm");
+const user_service_1 = require("../user/user.service");
 const bank_account_entity_1 = require("./entities/bank-account.entity");
 let BankAccountService = class BankAccountService {
-    constructor(bankAccountRepository) {
+    constructor(bankAccountRepository, userService) {
         this.bankAccountRepository = bankAccountRepository;
+        this.userService = userService;
     }
     async create(createBankAccountDto) {
-        const bankAccount = this.bankAccountRepository.create(createBankAccountDto);
+        const user = await this.userService.findOne(createBankAccountDto.userId);
+        const bankAccount = this.bankAccountRepository.create(Object.assign(Object.assign({}, createBankAccountDto), { user }));
         return this.bankAccountRepository.save(bankAccount);
     }
-    findAll() {
-        return this.bankAccountRepository.find();
+    findAll(filterBankAccountDto) {
+        return this.bankAccountRepository.find({
+            where: {
+                user: {
+                    id: filterBankAccountDto === null || filterBankAccountDto === void 0 ? void 0 : filterBankAccountDto.userId,
+                },
+            },
+        });
     }
     async findOne(id) {
         const bankAccount = await this.bankAccountRepository.findOne({
@@ -49,7 +58,8 @@ let BankAccountService = class BankAccountService {
 BankAccountService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, typeorm_1.InjectRepository)(bank_account_entity_1.BankAccount)),
-    __metadata("design:paramtypes", [typeorm_2.Repository])
+    __metadata("design:paramtypes", [typeorm_2.Repository,
+        user_service_1.UserService])
 ], BankAccountService);
 exports.BankAccountService = BankAccountService;
 //# sourceMappingURL=bank-account.service.js.map

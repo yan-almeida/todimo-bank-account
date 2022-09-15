@@ -12,6 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.CreateBankAccountDto = void 0;
 const swagger_1 = require("@nestjs/swagger");
 const class_validator_1 = require("class-validator");
+const uuid_1 = require("uuid");
 class CreateBankAccountDto {
 }
 __decorate([
@@ -36,5 +37,14 @@ __decorate([
     }),
     __metadata("design:type", String)
 ], CreateBankAccountDto.prototype, "accountNumber", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({
+        type: 'uuid',
+        description: 'Código identificador da conta.',
+        example: (0, uuid_1.v4)(),
+    }),
+    (0, class_validator_1.IsUUID)('4', { message: 'Identificador único do usuário é esperado.' }),
+    __metadata("design:type", String)
+], CreateBankAccountDto.prototype, "userId", void 0);
 exports.CreateBankAccountDto = CreateBankAccountDto;
 //# sourceMappingURL=create-bank-account.dto.js.map

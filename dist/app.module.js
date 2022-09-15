@@ -13,6 +13,8 @@ const app_controller_1 = require("./app.controller");
 const app_service_1 = require("./app.service");
 const bank_account_module_1 = require("./modules/bank-account/bank-account.module");
 const bank_account_entity_1 = require("./modules/bank-account/entities/bank-account.entity");
+const user_entity_1 = require("./modules/user/entities/user.entity");
+const user_module_1 = require("./modules/user/user.module");
 let AppModule = class AppModule {
 };
 AppModule = __decorate([
@@ -23,9 +25,10 @@ AppModule = __decorate([
                 database: __dirname + '/db.sqlite',
                 logging: true,
                 synchronize: true,
-                entities: [bank_account_entity_1.BankAccount],
+                entities: [bank_account_entity_1.BankAccount, user_entity_1.User],
             }),
             bank_account_module_1.BankAccountModule,
+            user_module_1.UserModule,
         ],
         controllers: [app_controller_1.AppController],
         providers: [app_service_1.AppService],

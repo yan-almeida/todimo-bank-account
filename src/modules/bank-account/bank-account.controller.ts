@@ -9,6 +9,7 @@ import {
   ParseUUIDPipe,
   Patch,
   Post,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import {
@@ -22,10 +23,11 @@ import { ActiveGuard } from 'src/common/guards/active.guard';
 import { BankAccountService } from './bank-account.service';
 import { BankAccountDto } from './dto/bank-account.dto';
 import { CreateBankAccountDto } from './dto/create-bank-account.dto';
+import { FilterBankAccountDto } from './dto/filter-bank-account.dto';
 import { UpdateBankAccountDto } from './dto/update-bank-account.dto';
 
 @ApiTags('Bank Account')
-@Controller('bank-account')
+@Controller('bank-accounts')
 @UseGuards(ActiveGuard)
 export class BankAccountController {
   constructor(private readonly bankAccountService: BankAccountService) {}
@@ -36,6 +38,7 @@ export class BankAccountController {
     type: BankAccountDto,
   })
   @ApiBadRequestResponse({ description: 'Erro de validação ao criar conta.' })
+  @ApiNotFoundResponse({ description: 'Usuário buscado não foi encontrado.' })
   @HttpCode(HttpStatus.CREATED)
   async create(
     @Body() createBankAccountDto: CreateBankAccountDto,
@@ -52,8 +55,12 @@ export class BankAccountController {
     description: 'Contas buscadas.',
     type: [BankAccountDto],
   })
-  async findAll(): Promise<BankAccountDto[]> {
-    const bankAccounts = await this.bankAccountService.findAll();
+  async findAll(
+    @Query() filterBankAccountDto: FilterBankAccountDto,
+  ): Promise<BankAccountDto[]> {
+    const bankAccounts = await this.bankAccountService.findAll(
+      filterBankAccountDto,
+    );
 
     return bankAccounts.map(BankAccountDto.toDto);
   }

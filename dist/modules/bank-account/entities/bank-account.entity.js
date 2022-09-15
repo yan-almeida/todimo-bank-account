@@ -10,6 +10,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.BankAccount = void 0;
+const user_entity_1 = require("../../user/entities/user.entity");
 const typeorm_1 = require("typeorm");
 let BankAccount = class BankAccount {
 };
@@ -31,6 +32,11 @@ __decorate([
     }),
     __metadata("design:type", String)
 ], BankAccount.prototype, "accountNumber", void 0);
+__decorate([
+    (0, typeorm_1.ManyToOne)(() => user_entity_1.User),
+    (0, typeorm_1.JoinColumn)({ name: 'user_id', referencedColumnName: 'id' }),
+    __metadata("design:type", user_entity_1.User)
+], BankAccount.prototype, "user", void 0);
 BankAccount = __decorate([
     (0, typeorm_1.Entity)('tb_bank_account')
 ], BankAccount);

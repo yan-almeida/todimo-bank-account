@@ -17,10 +17,18 @@ export class BankAccountDto {
   })
   accountNumber: string;
 
+  // @ApiPropertyOptional({
+  //   type: 'uuid',
+  //   description: 'Código identificador da conta.',
+  //   example: uuid(),
+  // })
+  // userId?: string;
+
   static toDto(bankAccount: BankAccount): BankAccountDto {
     return {
       id: bankAccount.id,
       accountNumber: bankAccount.accountNumber,
+      // userId: bankAccount?.user?.id,
     };
   }
 }

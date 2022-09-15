@@ -9,6 +9,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.BankAccountModule = void 0;
 const common_1 = require("@nestjs/common");
 const typeorm_1 = require("@nestjs/typeorm");
+const user_module_1 = require("../user/user.module");
 const bank_account_controller_1 = require("./bank-account.controller");
 const bank_account_service_1 = require("./bank-account.service");
 const bank_account_entity_1 = require("./entities/bank-account.entity");
@@ -16,7 +17,7 @@ let BankAccountModule = class BankAccountModule {
 };
 BankAccountModule = __decorate([
     (0, common_1.Module)({
-        imports: [typeorm_1.TypeOrmModule.forFeature([bank_account_entity_1.BankAccount])],
+        imports: [typeorm_1.TypeOrmModule.forFeature([bank_account_entity_1.BankAccount]), user_module_1.UserModule],
         controllers: [bank_account_controller_1.BankAccountController],
         providers: [bank_account_service_1.BankAccountService],
     })

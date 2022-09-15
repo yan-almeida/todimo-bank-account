@@ -19,6 +19,7 @@ const active_guard_1 = require("../../common/guards/active.guard");
 const bank_account_service_1 = require("./bank-account.service");
 const bank_account_dto_1 = require("./dto/bank-account.dto");
 const create_bank_account_dto_1 = require("./dto/create-bank-account.dto");
+const filter_bank_account_dto_1 = require("./dto/filter-bank-account.dto");
 const update_bank_account_dto_1 = require("./dto/update-bank-account.dto");
 let BankAccountController = class BankAccountController {
     constructor(bankAccountService) {
@@ -28,8 +29,8 @@ let BankAccountController = class BankAccountController {
         const bankAccount = await this.bankAccountService.create(createBankAccountDto);
         return bank_account_dto_1.BankAccountDto.toDto(bankAccount);
     }
-    async findAll() {
-        const bankAccounts = await this.bankAccountService.findAll();
+    async findAll(filterBankAccountDto) {
+        const bankAccounts = await this.bankAccountService.findAll(filterBankAccountDto);
         return bankAccounts.map(bank_account_dto_1.BankAccountDto.toDto);
     }
     async findOne(id) {
@@ -50,6 +51,7 @@ __decorate([
         type: bank_account_dto_1.BankAccountDto,
     }),
     (0, swagger_1.ApiBadRequestResponse)({ description: 'Erro de validação ao criar conta.' }),
+    (0, swagger_1.ApiNotFoundResponse)({ description: 'Usuário buscado não foi encontrado.' }),
     (0, common_1.HttpCode)(common_1.HttpStatus.CREATED),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
@@ -62,8 +64,9 @@ __decorate([
         description: 'Contas buscadas.',
         type: [bank_account_dto_1.BankAccountDto],
     }),
+    __param(0, (0, common_1.Query)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", []),
+    __metadata("design:paramtypes", [filter_bank_account_dto_1.FilterBankAccountDto]),
     __metadata("design:returntype", Promise)
 ], BankAccountController.prototype, "findAll", null);
 __decorate([
@@ -96,7 +99,7 @@ __decorate([
 ], BankAccountController.prototype, "remove", null);
 BankAccountController = __decorate([
     (0, swagger_1.ApiTags)('Bank Account'),
-    (0, common_1.Controller)('bank-account'),
+    (0, common_1.Controller)('bank-accounts'),
     (0, common_1.UseGuards)(active_guard_1.ActiveGuard),
     __metadata("design:paramtypes", [bank_account_service_1.BankAccountService])
 ], BankAccountController);
