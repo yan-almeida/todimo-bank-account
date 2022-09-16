@@ -77,11 +77,13 @@ export class UserController {
     description: 'Usuário já cadastrado.',
   })
   @ApiBadRequestResponse({ description: 'Erro de validação ao criar usuário.' })
-  update(
+  async update(
     @Param('id', ParseUUIDPipe) id: string,
     @Body() updateUserDto: UpdateUserDto,
-  ) {
-    return this.userService.update(id, updateUserDto);
+  ): Promise<UserDto> {
+    const user = await this.userService.update(id, updateUserDto);
+
+    return UserDto.from(user);
   }
 
   @Delete(':id')

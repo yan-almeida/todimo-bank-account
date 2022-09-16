@@ -17,9 +17,13 @@ let BankAccountModule = class BankAccountModule {
 };
 BankAccountModule = __decorate([
     (0, common_1.Module)({
-        imports: [typeorm_1.TypeOrmModule.forFeature([bank_account_entity_1.BankAccount]), user_module_1.UserModule],
+        imports: [
+            typeorm_1.TypeOrmModule.forFeature([bank_account_entity_1.BankAccount]),
+            (0, common_1.forwardRef)(() => user_module_1.UserModule),
+        ],
         controllers: [bank_account_controller_1.BankAccountController],
         providers: [bank_account_service_1.BankAccountService],
+        exports: [bank_account_service_1.BankAccountService],
     })
 ], BankAccountModule);
 exports.BankAccountModule = BankAccountModule;

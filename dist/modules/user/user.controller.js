@@ -35,8 +35,9 @@ let UserController = class UserController {
         const user = await this.userService.findOne(id);
         return user_dto_1.UserDto.from(user);
     }
-    update(id, updateUserDto) {
-        return this.userService.update(id, updateUserDto);
+    async update(id, updateUserDto) {
+        const user = await this.userService.update(id, updateUserDto);
+        return user_dto_1.UserDto.from(user);
     }
     remove(id) {
         return this.userService.remove(id);
@@ -94,7 +95,7 @@ __decorate([
     __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String, update_user_dto_1.UpdateUserDto]),
-    __metadata("design:returntype", void 0)
+    __metadata("design:returntype", Promise)
 ], UserController.prototype, "update", null);
 __decorate([
     (0, common_1.Delete)(':id'),

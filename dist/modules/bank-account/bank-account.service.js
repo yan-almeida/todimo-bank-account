@@ -11,6 +11,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
+var BankAccountService_1;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.BankAccountService = void 0;
 const common_1 = require("@nestjs/common");
@@ -18,10 +19,11 @@ const typeorm_1 = require("@nestjs/typeorm");
 const typeorm_2 = require("typeorm");
 const user_service_1 = require("../user/user.service");
 const bank_account_entity_1 = require("./entities/bank-account.entity");
-let BankAccountService = class BankAccountService {
+let BankAccountService = BankAccountService_1 = class BankAccountService {
     constructor(bankAccountRepository, userService) {
         this.bankAccountRepository = bankAccountRepository;
         this.userService = userService;
+        this.logger = new common_1.Logger(BankAccountService_1.name);
     }
     async create(createBankAccountDto) {
         const user = await this.userService.findOne(createBankAccountDto.userId);
@@ -54,10 +56,24 @@ let BankAccountService = class BankAccountService {
     remove(id) {
         return `This action removes a #${id} bankAccount`;
     }
+    async removeByUserId(userId) {
+        this.logger.debug(`removendo contas bancárias - [userId][${userId}]`);
+        const deleteResult = await this.bankAccountRepository.delete({
+            user: {
+                id: userId,
+            },
+        });
+        if (deleteResult.affected === 0) {
+            this.logger.log(`erro ao remover contas bancárias - [userId][${userId}]`);
+            throw new common_1.UnprocessableEntityException('Usuário possui contas ativas.');
+        }
+        this.logger.debug(`contas bancárias removidas com sucesso - [userId][${userId}]`);
+    }
 };
-BankAccountService = __decorate([
+BankAccountService = BankAccountService_1 = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, typeorm_1.InjectRepository)(bank_account_entity_1.BankAccount)),
+    __param(1, (0, common_1.Inject)((0, common_1.forwardRef)(() => user_service_1.UserService))),
     __metadata("design:paramtypes", [typeorm_2.Repository,
         user_service_1.UserService])
 ], BankAccountService);

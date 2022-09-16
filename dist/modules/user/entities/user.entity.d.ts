@@ -3,5 +3,6 @@ import { BankAccount } from 'src/modules/bank-account/entities/bank-account.enti
 export declare class User extends UniqueIdentifierEntity {
     name: string;
     email: string;
+    password: string;
     bankAccounts: BankAccount[];
 }

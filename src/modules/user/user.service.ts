@@ -1,10 +1,14 @@
 import {
   ConflictException,
+  forwardRef,
+  Inject,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { BcryptAdapter } from 'src/adapter/encryptation/bcrypt/bcrypt.adapter';
+import { FindOptionsWhere, Not, Repository } from 'typeorm';
+import { BankAccountService } from '../bank-account/bank-account.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
@@ -13,13 +17,18 @@ import { User } from './entities/user.entity';
 export class UserService {
   constructor(
     @InjectRepository(User)
-    private readonly userRepository: Repository<User>, // adicionar BankAccountService
+    private readonly userRepository: Repository<User>,
+    @Inject(forwardRef(() => BankAccountService))
+    private readonly bankAccountService: BankAccountService,
+    private readonly bcryptAdapter: BcryptAdapter,
   ) {}
 
   async create(createUserDto: CreateUserDto): Promise<User> {
     await this.validateUserExistsByEmail(createUserDto.email);
 
-    const user = this.userRepository.create(createUserDto);
+    const password = await this.bcryptAdapter.encrypt(createUserDto.password);
+
+    const user = this.userRepository.create({ ...createUserDto, password });
 
     return this.userRepository.save(user);
   }
@@ -42,22 +51,24 @@ export class UserService {
     return user;
   }
 
-  async findOneByEmail(email: string): Promise<User> {
-    const user = await this.userRepository.findOneBy({ email });
+  findOneBy(
+    where: FindOptionsWhere<User> | FindOptionsWhere<User>[],
+  ): Promise<User> {
+    return this.userRepository.findOneBy(where);
+  }
 
-    if (!user) {
+  async update(id: string, updateUserDto: UpdateUserDto): Promise<User> {
+    if (updateUserDto?.email) {
+      await this.validateEmailAndIdIsNotSameUser(id, updateUserDto.email);
+    }
+
+    const updateResult = await this.userRepository.update(id, updateUserDto);
+
+    if (updateResult.affected === 0) {
       throw new NotFoundException('Usuário não encontrado.');
     }
 
-    return user;
-  }
-
-  async update(id: string, updateUserDto: UpdateUserDto) {
-    if (updateUserDto?.email) {
-      await this.validateUserExistsByEmail(updateUserDto.email);
-    }
-
-    return `This action updates a #${id} user`;
+    return this.userRepository.findOneBy({ id });
   }
 
   async remove(id: string): Promise<void> {
@@ -65,11 +76,27 @@ export class UserService {
 
     const softDeleteResult = await this.userRepository.softDelete(id);
 
-    // ao remover um usuário, será necessário DESATIVAR/DELETAR as suas contas bancárias
-
     if (softDeleteResult.affected === 0) {
       // throw new UnprocessableEntityException('Registro não alterado.');
       throw new NotFoundException('Usuário não encontrado.');
+    }
+
+    // ao remover um usuário, será necessário DESATIVAR/DELETAR as suas contas bancárias
+
+    await this.bankAccountService.removeByUserId(id);
+  }
+
+  private async validateEmailAndIdIsNotSameUser(
+    id: string,
+    email: string,
+  ): Promise<void> {
+    const count = await this.userRepository.countBy({
+      id: Not(id),
+      email,
+    });
+
+    if (count > 0) {
+      throw new ConflictException('Usuário já cadastrado.');
     }
   }
 

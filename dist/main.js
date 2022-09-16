@@ -20,7 +20,7 @@ async function bootstrap() {
     app.useGlobalInterceptors(new common_1.ClassSerializerInterceptor(app.get(core_1.Reflector)), new timeout_interceptor_1.TimeoutInterceptor());
     await app.listen(3000);
     const url = await app.getUrl();
-    common_1.Logger.debug(`Swagger application is running on: ${url}/swagger`);
+    common_1.Logger.verbose(`Swagger application is running on: ${url}/swagger`);
 }
 bootstrap();
 //# sourceMappingURL=main.js.map

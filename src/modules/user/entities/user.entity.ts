@@ -10,6 +10,9 @@ export class User extends UniqueIdentifierEntity {
   @Column({ length: '200' })
   email: string;
 
+  @Column()
+  password: string;
+
   @OneToMany(() => BankAccount, () => User)
   bankAccounts: BankAccount[];
 }

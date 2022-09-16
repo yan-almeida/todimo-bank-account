@@ -6,22 +6,26 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.TimeoutInterceptor = void 0;
+exports.BcryptAdapter = void 0;
 const common_1 = require("@nestjs/common");
-const rxjs_1 = require("rxjs");
-const TIMEOUT_IN_SEC = 1000;
-let TimeoutInterceptor = class TimeoutInterceptor {
-    intercept(_, next) {
-        return next.handle().pipe((0, rxjs_1.timeout)(TIMEOUT_IN_SEC), (0, rxjs_1.catchError)((error) => {
-            if (error instanceof rxjs_1.TimeoutError) {
-                return (0, rxjs_1.throwError)(() => new common_1.RequestTimeoutException());
-            }
-            return (0, rxjs_1.throwError)(() => error);
-        }));
+const bcrypt_1 = require("bcrypt");
+let BcryptAdapter = class BcryptAdapter {
+    constructor() {
+        this.rounds = 10;
+    }
+    async encrypt(plainText) {
+        const salts = await this.generateSalts();
+        return (0, bcrypt_1.hash)(plainText, salts);
+    }
+    async compare(plainText, hash) {
+        return (0, bcrypt_1.compareSync)(plainText, hash);
+    }
+    generateSalts() {
+        return (0, bcrypt_1.genSalt)(this.rounds);
     }
 };
-TimeoutInterceptor = __decorate([
+BcryptAdapter = __decorate([
     (0, common_1.Injectable)()
-], TimeoutInterceptor);
-exports.TimeoutInterceptor = TimeoutInterceptor;
-//# sourceMappingURL=timeout.interceptor.js.map
+], BcryptAdapter);
+exports.BcryptAdapter = BcryptAdapter;
+//# sourceMappingURL=bcrypt.adapter.js.map

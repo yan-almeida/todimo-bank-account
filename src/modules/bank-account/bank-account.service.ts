@@ -1,4 +1,11 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  forwardRef,
+  Inject,
+  Injectable,
+  Logger,
+  NotFoundException,
+  UnprocessableEntityException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { UserService } from '../user/user.service';
@@ -9,9 +16,12 @@ import { BankAccount } from './entities/bank-account.entity';
 
 @Injectable()
 export class BankAccountService {
+  private readonly logger = new Logger(BankAccountService.name);
+
   constructor(
     @InjectRepository(BankAccount)
     private readonly bankAccountRepository: Repository<BankAccount>,
+    @Inject(forwardRef(() => UserService))
     private readonly userService: UserService,
   ) {}
 
@@ -79,5 +89,25 @@ export class BankAccountService {
 
   remove(id: string) {
     return `This action removes a #${id} bankAccount`;
+  }
+
+  async removeByUserId(userId: string) {
+    this.logger.debug(`removendo contas bancárias - [userId][${userId}]`);
+
+    const deleteResult = await this.bankAccountRepository.delete({
+      user: {
+        id: userId,
+      },
+    });
+
+    if (deleteResult.affected === 0) {
+      this.logger.log(`erro ao remover contas bancárias - [userId][${userId}]`);
+
+      throw new UnprocessableEntityException('Usuário possui contas ativas.');
+    }
+
+    this.logger.debug(
+      `contas bancárias removidas com sucesso - [userId][${userId}]`,
+    );
   }
 }

@@ -12,9 +12,14 @@ export class CreateUserDto {
   name: string;
 
   @ApiProperty({ maxLength: 200 })
-  @MaxLength(255, {
+  @MaxLength(200, {
     message: 'O email do usuário deve conter, no máximo, 200 caracteres.',
   })
   @IsEmail({}, { message: 'Email do usuário não é válido.' })
   email: string;
+
+  @ApiProperty({
+    description: 'Senha do usuário.',
+  })
+  password: string;
 }

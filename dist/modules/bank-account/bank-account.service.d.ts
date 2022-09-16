@@ -7,10 +7,12 @@ import { BankAccount } from './entities/bank-account.entity';
 export declare class BankAccountService {
     private readonly bankAccountRepository;
     private readonly userService;
+    private readonly logger;
     constructor(bankAccountRepository: Repository<BankAccount>, userService: UserService);
     create(createBankAccountDto: CreateBankAccountDto): Promise<BankAccount>;
     findAll(filterBankAccountDto: FilterBankAccountDto): Promise<BankAccount[]>;
     findOne(id: string): Promise<BankAccount>;
     update(id: string, updateBankAccountDto: UpdateBankAccountDto): string;
     remove(id: string): string;
+    removeByUserId(userId: string): Promise<void>;
 }

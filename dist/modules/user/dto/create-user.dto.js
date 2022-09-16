@@ -26,11 +26,17 @@ __decorate([
 ], CreateUserDto.prototype, "name", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({ maxLength: 200 }),
-    (0, class_validator_1.MaxLength)(255, {
+    (0, class_validator_1.MaxLength)(200, {
         message: 'O email do usuário deve conter, no máximo, 200 caracteres.',
     }),
     (0, class_validator_1.IsEmail)({}, { message: 'Email do usuário não é válido.' }),
     __metadata("design:type", String)
 ], CreateUserDto.prototype, "email", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({
+        description: 'Senha do usuário.',
+    }),
+    __metadata("design:type", String)
+], CreateUserDto.prototype, "password", void 0);
 exports.CreateUserDto = CreateUserDto;
 //# sourceMappingURL=create-user.dto.js.map

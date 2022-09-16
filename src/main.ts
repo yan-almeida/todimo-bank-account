@@ -33,6 +33,6 @@ async function bootstrap() {
   await app.listen(3000);
   const url = await app.getUrl();
 
-  Logger.debug(`Swagger application is running on: ${url}/swagger`);
+  Logger.verbose(`Swagger application is running on: ${url}/swagger`);
 }
 bootstrap();
