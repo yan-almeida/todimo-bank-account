@@ -21,6 +21,7 @@ export class BankAccount {
   @Column({
     name: 'account_number',
     length: 50,
+    // unique: true,
   })
   accountNumber: string; // coluna: account_number, tamanho max. 50. varchar(50)
 

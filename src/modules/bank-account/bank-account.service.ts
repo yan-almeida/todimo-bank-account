@@ -26,9 +26,12 @@ export class BankAccountService {
   ) {}
 
   async create(
+    userId: string,
     createBankAccountDto: CreateBankAccountDto,
   ): Promise<BankAccount> {
-    const user = await this.userService.findOne(createBankAccountDto.userId);
+    const user = await this.userService.findOne(userId);
+
+    // validar contas bancarias - não permitir criar contas bancarias com o mesmo número
 
     const bankAccount = this.bankAccountRepository.create({
       ...createBankAccountDto,
@@ -69,10 +72,13 @@ export class BankAccountService {
   /**
    * select * from tb_bank_account where id = :id
    */
-  async findOne(id: string): Promise<BankAccount> {
+  async findOne(id: string, userId: string): Promise<BankAccount> {
     const bankAccount = await this.bankAccountRepository.findOne({
       where: {
         id,
+        user: {
+          id: userId,
+        },
       },
     });
 

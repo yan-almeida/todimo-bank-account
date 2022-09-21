@@ -15,6 +15,7 @@ async function bootstrap() {
     .setTitle('Web API - Todimo')
     .setDescription('API responsável: Todimo')
     .setVersion('1.0')
+    .addBearerAuth()
     .build();
 
   const document = SwaggerModule.createDocument(app, config);

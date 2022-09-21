@@ -5,13 +5,13 @@ import {
   Get,
   HttpCode,
   HttpStatus,
-  Param,
-  ParseUUIDPipe,
   Patch,
   Post,
+  UseGuards,
 } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
+  ApiBearerAuth,
   ApiConflictResponse,
   ApiCreatedResponse,
   ApiNoContentResponse,
@@ -19,6 +19,9 @@ import {
   ApiOkResponse,
   ApiTags,
 } from '@nestjs/swagger';
+import { PublicRoute } from 'src/common/decorators/public-route.decorator';
+import { User } from 'src/common/decorators/user.decorator';
+import { JwtGuard } from 'src/common/guards/jwt.guard';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserDto } from './dto/user.dto';
@@ -26,6 +29,7 @@ import { UserService } from './user.service';
 
 @Controller('users')
 @ApiTags('Users')
+@UseGuards(JwtGuard)
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
@@ -38,6 +42,7 @@ export class UserController {
     description: 'Usuário já cadastrado.',
   })
   @ApiBadRequestResponse({ description: 'Erro de validação ao criar usuário.' })
+  @PublicRoute()
   @HttpCode(HttpStatus.CREATED)
   async create(@Body() createUserDto: CreateUserDto): Promise<UserDto> {
     const user = await this.userService.create(createUserDto);
@@ -50,25 +55,27 @@ export class UserController {
     description: 'Usuários buscados.',
     type: [UserDto],
   })
+  @ApiBearerAuth()
   async findAll(): Promise<UserDto[]> {
     const users = await this.userService.findAll();
 
     return users.map(UserDto.from);
   }
 
-  @Get(':id')
-  @ApiOkResponse({
-    description: 'Usuário buscado pelo ID.',
-    type: UserDto,
-  })
-  @ApiNotFoundResponse({ description: 'Usuário buscado não foi encontrado.' })
-  async findOne(@Param('id', ParseUUIDPipe) id: string): Promise<UserDto> {
-    const user = await this.userService.findOne(id);
+  // @Get()
+  // @ApiOkResponse({
+  //   description: 'Usuário buscado pelo ID.',
+  //   type: UserDto,
+  // })
+  // @ApiNotFoundResponse({ description: 'Usuário buscado não foi encontrado.' })
+  // @ApiBearerAuth()
+  // async findOne(@User() { id }: Express.User): Promise<UserDto> {
+  //   const user = await this.userService.findOne(id);
 
-    return UserDto.from(user);
-  }
+  //   return UserDto.from(user);
+  // }
 
-  @Patch(':id')
+  @Patch()
   @ApiOkResponse({
     description: 'Usuários buscados.',
     type: [UserDto],
@@ -77,8 +84,9 @@ export class UserController {
     description: 'Usuário já cadastrado.',
   })
   @ApiBadRequestResponse({ description: 'Erro de validação ao criar usuário.' })
+  @ApiBearerAuth()
   async update(
-    @Param('id', ParseUUIDPipe) id: string,
+    @User() { id }: Express.User,
     @Body() updateUserDto: UpdateUserDto,
   ): Promise<UserDto> {
     const user = await this.userService.update(id, updateUserDto);
@@ -86,7 +94,7 @@ export class UserController {
     return UserDto.from(user);
   }
 
-  @Delete(':id')
+  @Delete()
   @ApiNoContentResponse({
     description: 'Usuário removido com sucesso.',
   })
@@ -94,8 +102,9 @@ export class UserController {
   @ApiNotFoundResponse({
     description: 'Usuário a ser remover não foi encontrado.',
   })
+  @ApiBearerAuth()
   @HttpCode(HttpStatus.NO_CONTENT)
-  remove(@Param('id', ParseUUIDPipe) id: string): Promise<void> {
+  remove(@User() { id }: Express.User): Promise<void> {
     return this.userService.remove(id);
   }
 }

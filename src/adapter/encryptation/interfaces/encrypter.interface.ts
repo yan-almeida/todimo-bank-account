@@ -1,11 +1,16 @@
-export interface EncrypterAdapter {
+export abstract class EncrypterAdapter {
   /**
-   * Realizar encriptação de texto plano, retornando um hash.
+   * Realiza encriptação de texto plano, retornando um hash.
    *
    * @param plainText - texto plano de entrada
    */
-  encrypt(plainText: string): Promise<string>;
+  abstract encrypt(plainText: string): Promise<string>;
 
-  /** @deprecated */
-  compare(plainText: string, hash: string): Promise<boolean>;
+  /**
+   * Realiza comparação entre dados de entrada - senha e senha armazenada.
+   *
+   * @param plainText - texto plano de entrada
+   * @param hash - texto encriptado
+   */
+  abstract compare(plainText: string, hash: string): Promise<boolean>;
 }

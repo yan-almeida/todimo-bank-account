@@ -1,6 +1,6 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { BcryptAdapter } from 'src/adapter/encryptation/bcrypt/bcrypt.adapter';
+import { EncrypterAdapter } from 'src/adapter/encryptation/interfaces/encrypter.interface';
 import { UserService } from '../user/user.service';
 import { AuthDto } from './dto/auth.dto';
 
@@ -8,7 +8,7 @@ import { AuthDto } from './dto/auth.dto';
 export class AuthService {
   constructor(
     private readonly userService: UserService,
-    private readonly bcryptAdapter: BcryptAdapter,
+    private readonly encrypterAdapter: EncrypterAdapter,
     private readonly jwtService: JwtService,
   ) {}
 
@@ -28,7 +28,6 @@ export class AuthService {
     return this.jwtService.signAsync(
       {
         id: user.id,
-        name: user.name,
       },
       {
         privateKey: 'master-ultra-mega-secret-todimo-8410-8569',
@@ -36,12 +35,18 @@ export class AuthService {
     );
   }
 
+  profile(userId: string) {
+    return this.userService.findOne(userId);
+  }
+
   private async validateUserPasword(
     plainText: string,
     hash: string,
   ): Promise<void> {
-    // const hashedPlainText = await this.bcryptAdapter.encrypt(plainText);
-    const isValidPassword = await this.bcryptAdapter.compare(plainText, hash);
+    const isValidPassword = await this.encrypterAdapter.compare(
+      plainText,
+      hash,
+    );
 
     if (!isValidPassword) {
       throw new UnauthorizedException();

@@ -1,6 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNumber, IsString, IsUUID, MaxLength } from 'class-validator';
-import { v4 as uuid } from 'uuid';
+import { IsNumber, IsString, MaxLength } from 'class-validator';
 
 export class CreateBankAccountDto {
   @ApiProperty({
@@ -23,11 +22,11 @@ export class CreateBankAccountDto {
   })
   accountNumber: string;
 
-  @ApiProperty({
-    type: 'uuid',
-    description: 'Código identificador da conta.',
-    example: uuid(),
-  })
-  @IsUUID('4', { message: 'Identificador único do usuário é esperado.' })
-  userId: string;
+  // @ApiProperty({
+  //   type: 'uuid',
+  //   description: 'Código identificador da conta.',
+  //   example: uuid(),
+  // })
+  // @IsUUID('4', { message: 'Identificador único do usuário é esperado.' })
+  // userId: string;
 }

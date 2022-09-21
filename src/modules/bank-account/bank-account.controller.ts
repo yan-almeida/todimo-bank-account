@@ -14,12 +14,15 @@ import {
 } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
+  ApiBearerAuth,
   ApiCreatedResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
   ApiTags,
+  ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
-import { ActiveGuard } from 'src/common/guards/active.guard';
+import { User } from 'src/common/decorators/user.decorator';
+import { JwtGuard } from 'src/common/guards/jwt.guard';
 import { BankAccountService } from './bank-account.service';
 import { BankAccountDto } from './dto/bank-account.dto';
 import { CreateBankAccountDto } from './dto/create-bank-account.dto';
@@ -28,7 +31,11 @@ import { UpdateBankAccountDto } from './dto/update-bank-account.dto';
 
 @ApiTags('Bank Account')
 @Controller('bank-accounts')
-@UseGuards(ActiveGuard)
+@ApiBearerAuth()
+@ApiUnauthorizedResponse({
+  description: 'Usuário não está autenticado ou possuí token expirado.',
+})
+@UseGuards(JwtGuard)
 export class BankAccountController {
   constructor(private readonly bankAccountService: BankAccountService) {}
 
@@ -42,8 +49,10 @@ export class BankAccountController {
   @HttpCode(HttpStatus.CREATED)
   async create(
     @Body() createBankAccountDto: CreateBankAccountDto,
+    @User() user: Express.User,
   ): Promise<BankAccountDto> {
     const bankAccount = await this.bankAccountService.create(
+      user.id,
       createBankAccountDto,
     );
 
@@ -74,8 +83,9 @@ export class BankAccountController {
   @ApiBadRequestResponse({ description: 'Erro de validação ao buscar conta.' })
   async findOne(
     @Param('id', ParseUUIDPipe) id: string,
+    @User() user: Express.User,
   ): Promise<BankAccountDto> {
-    const bankAccount = await this.bankAccountService.findOne(id);
+    const bankAccount = await this.bankAccountService.findOne(id, user.id);
 
     return BankAccountDto.toDto(bankAccount);
   }
