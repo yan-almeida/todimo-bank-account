@@ -7,7 +7,7 @@ import {
   UnprocessableEntityException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { FindOptionsWhere, Repository } from 'typeorm';
 import { UserService } from '../user/user.service';
 import { CreateBankAccountDto } from './dto/create-bank-account.dto';
 import { FilterBankAccountDto } from './dto/filter-bank-account.dto';
@@ -87,6 +87,12 @@ export class BankAccountService {
     }
 
     return bankAccount;
+  }
+
+  findBy(
+    where: FindOptionsWhere<BankAccount> | FindOptionsWhere<BankAccount>[],
+  ) {
+    return this.bankAccountRepository.findBy(where);
   }
 
   update(id: string, updateBankAccountDto: UpdateBankAccountDto) {

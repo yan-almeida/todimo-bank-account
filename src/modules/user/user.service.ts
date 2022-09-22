@@ -7,6 +7,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { BcryptAdapter } from 'src/adapter/encryptation/bcrypt/bcrypt.adapter';
+import { Readable, Transform } from 'stream';
 import { FindOptionsWhere, Not, Repository } from 'typeorm';
 import { BankAccountService } from '../bank-account/bank-account.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -109,4 +110,81 @@ export class UserService {
       throw new ConflictException('Usuário já cadastrado.');
     }
   }
+
+  async export() {
+    let counter = 0;
+
+    const readable = Readable.from(this.generateUserAndBankAccounts());
+
+    const mapToCsv = new Transform({
+      transform(chunk, _, callback) {
+        const {
+          userId,
+          userName,
+          accountNumber,
+          balance,
+        }: ExportUserBankAccount = JSON.parse(chunk);
+
+        const result = `${userId},${userName},${accountNumber},${balance}\n`;
+        callback(null, result);
+      },
+    });
+
+    const setHeader = new Transform({
+      transform(chunk, _, callback) {
+        if (counter) {
+          return callback(null, chunk);
+        }
+
+        counter++;
+
+        callback(
+          null,
+          `identificador do usuário,nome completo,número da conta,saldo\n`.concat(
+            chunk,
+          ),
+        );
+      },
+    });
+
+    return {
+      readable,
+      mapToCsv,
+      setHeader,
+    };
+  }
+
+  private async *generateUserAndBankAccounts(): AsyncGenerator<
+    string,
+    void,
+    unknown
+  > {
+    const users = await this.userRepository.find();
+
+    for (const user of users) {
+      const bankAccounts = await this.bankAccountService.findBy({
+        user: {
+          id: user.id,
+        },
+      });
+
+      for (const { accountNumber, balance } of bankAccounts) {
+        const exportUserBankAccount: ExportUserBankAccount = {
+          accountNumber,
+          balance,
+          userId: user.id,
+          userName: user.name,
+        };
+
+        yield JSON.stringify(exportUserBankAccount);
+      }
+    }
+  }
+}
+
+interface ExportUserBankAccount {
+  userId: string;
+  userName: string;
+  accountNumber: string;
+  balance: number;
 }

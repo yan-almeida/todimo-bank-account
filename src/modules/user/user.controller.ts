@@ -3,10 +3,12 @@ import {
   Controller,
   Delete,
   Get,
+  Header,
   HttpCode,
   HttpStatus,
   Patch,
   Post,
+  Res,
   UseGuards,
 } from '@nestjs/common';
 import {
@@ -19,9 +21,11 @@ import {
   ApiOkResponse,
   ApiTags,
 } from '@nestjs/swagger';
+import { Response } from 'express';
 import { PublicRoute } from 'src/common/decorators/public-route.decorator';
 import { User } from 'src/common/decorators/user.decorator';
 import { JwtGuard } from 'src/common/guards/jwt.guard';
+import { AsyncPipeline } from 'src/common/utils/async-pipeline.util';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserDto } from './dto/user.dto';
@@ -106,5 +110,15 @@ export class UserController {
   @HttpCode(HttpStatus.NO_CONTENT)
   remove(@User() { id }: Express.User): Promise<void> {
     return this.userService.remove(id);
+  }
+
+  @Get('export')
+  @Header('Content-type', 'text/csv')
+  @Header('Content-Disposition', 'attachment; filename="users.csv"')
+  @PublicRoute()
+  async exportUsers(@Res() response: Response): Promise<void> {
+    const { readable, mapToCsv, setHeader } = await this.userService.export();
+
+    await AsyncPipeline(readable, mapToCsv, setHeader, response);
   }
 }

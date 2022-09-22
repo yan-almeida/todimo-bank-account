@@ -13,6 +13,6 @@ export class User extends UniqueIdentifierEntity {
   @Column()
   password: string;
 
-  @OneToMany(() => BankAccount, () => User)
+  @OneToMany(() => User, () => BankAccount)
   bankAccounts: BankAccount[];
 }
