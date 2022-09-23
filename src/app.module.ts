@@ -8,6 +8,7 @@ import { BankAccount } from './modules/bank-account/entities/bank-account.entity
 import { FilesModule } from './modules/files/files.module';
 import { User } from './modules/user/entities/user.entity';
 import { UserModule } from './modules/user/user.module';
+import { UploadFilesModule } from './modules/upload-files/upload-files.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { UserModule } from './modules/user/user.module';
     UserModule,
     AuthModule,
     FilesModule,
+    UploadFilesModule,
   ],
   controllers: [AppController],
   providers: [AppService],
